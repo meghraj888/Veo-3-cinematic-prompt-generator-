@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Cinematic Video Prompt Generator (Pro) - Asterisk Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0f1f; 
+            color: #e0e0e0; 
+        }
+        .label {
+            color: #a0aec0; 
+            font-weight: 500;
+        }
+        input[type="text"], select, textarea {
+            background-color: #1a202c; 
+            border: 1px solid #2d3748; 
+            color: #e0e0e0;
+            border-radius: 0.375rem; 
+            padding: 0.625rem 0.75rem; 
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: #4a5568; 
+            box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.3); 
+            outline: none;
+        }
+        .btn {
+            border-radius: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn:active {
+            transform: translateY(1px);
+        }
+        .btn-primary {
+            background-color: #3b82f6; 
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);
+        }
+        .btn-secondary {
+            background-color: #4a5568; 
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #2d3748;
+            box-shadow: 0 4px 6px -1px rgba(74, 85, 104, 0.3), 0 2px 4px -1px rgba(74, 85, 104, 0.2);
+        }
+        .btn-ai {
+            background: linear-gradient(to right, #6d28d9, #9333ea); 
+            color: white;
+        }
+        .btn-ai:hover {
+            background: linear-gradient(to right, #5b21b6, #7e22ce);
+            box-shadow: 0 4px 6px -1px rgba(147, 51, 234, 0.3), 0 2px 4px -1px rgba(147, 51, 234, 0.2);
+        }
+        .btn-small-ai {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .section-title {
+            font-size: 1.375rem; 
+            font-weight: 700; 
+            color: #cbd5e0; 
+            border-bottom: 2px solid #2d3748; 
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #1a202c; }
+        ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #718096; }
+        input[type="checkbox"] {
+            appearance: none; background-color: #1f2937; border: 1px solid #374151;
+            border-radius: 0.25rem; width: 1.35rem; height: 1.35rem;
+            display: inline-block; position: relative; cursor: pointer;
+            margin-right: 0.6rem; vertical-align: middle;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        input[type="checkbox"]:checked { background-color: #3b82f6; border-color: #3b82f6; }
+        input[type="checkbox"]:checked::after {
+            content: '✔'; font-size: 0.9rem; color: white;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .toast {
+            position: fixed; bottom: 25px; left: 50%;
+            background-color: #3b82f6; color: white; padding: 12px 24px;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 1000; opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+            font-weight: 500;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.hidden-toast { transform: translateX(-50%) translateY(20px); }
+        .loader {
+            width: 20px; height: 20px; border: 3px solid #FFF;
+            border-bottom-color: transparent; border-radius: 50%;
+            display: inline-block; box-sizing: border-box;
+            animation: rotation 1s linear infinite; margin-left: 10px;
+        }
+        .loader-small { width: 16px; height: 16px; border-width: 2px; margin-left: 6px;}
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1a202c; border-radius: 4px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 4px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #718096; }
+        .logo-placeholder {
+            font-size: 1.5rem; font-weight: 800; color: #60a5fa;
+            letter-spacing: 0.5px; display: flex; align-items: center;
+        }
+        .logo-placeholder svg { width: 32px; height: 32px; margin-right: 8px; fill: currentColor; }
+        .dialogue-entry { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+        .dialogue-entry input[type="text"] { flex-grow: 1; }
+        .dialogue-entry button { padding: 0.5rem; background-color: #ef4444; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-7xl bg-[#111827] p-6 sm:p-8 rounded-xl shadow-2xl border border-[#2d3748]">
+        <header class="mb-8 flex flex-col sm:flex-row justify-between items-center">
+            <div class="logo-placeholder mb-4 sm:mb-0">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg> 
+                PromptCraft Pro
+            </div>
+            <div class="text-center sm:text-right">
+                <h1 class="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+                    Advanced Cinematic Video Prompt Generator
+                </h1>
+                <p class="text-gray-400 mt-1 text-sm">Veo 3 aur anya AI video tools ke liye. Dialogue, Music, Language aur Quick AI ke saath! ✨</p>
+            </div>
+        </header>
+
+        <div class="mb-8 p-6 bg-[#1a202c] rounded-lg border border-[#2d3748]">
+            <h2 class="section-title text-xl mb-4">🚀 Quick AI Prompt (Instant Full Scene)</h2>
+            <p class="text-sm text-gray-400 mb-3">Bas apna idea likhein (ek line ya kuch keywords), aur AI aapke liye visuals, dialogue, music, language sabke saath ek poora cinematic prompt bana dega!</p>
+            <div class="flex flex-col sm:flex-row gap-3 items-end">
+                <div class="flex-grow w-full">
+                    <label for="quickIdea" class="label block mb-1">Aapka Idea / Vichar:</label>
+                    <input type="text" id="quickIdea" class="w-full" placeholder="उदा. Ek cybercity mein baarish mein detective, ya do robots ki dosti">
+                </div>
+                 <div class="w-full sm:w-auto">
+                    <label for="quickIdeaLang" class="label block mb-1">Mukhya Bhasha:</label>
+                    <select id="quickIdeaLang" class="w-full">
+                        <option value="English">English</option>
+                        </select>
+                </div>
+                <button id="quickAIGenerateBtn" class="btn btn-ai w-full sm:w-auto mt-2 sm:mt-0">
+                    ⚡ AI se Instant Prompt Banayein
+                    <span id="quickAILoader" class="loader hidden"></span>
+                </button>
+            </div>
+        </div>
+
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="space-y-8 pr-0 lg:pr-6 lg:border-r lg:border-gray-700 overflow-y-auto max-h-[75vh] custom-scrollbar pb-8">
+                
+                <div>
+                    <h2 class="section-title">Quick Start: Style Presets</h2>
+                    <select id="stylePreset" name="stylePreset" class="w-full">
+                        <option value="">-- No Preset --</option>
+                        </select>
+                </div>
+
+                <div>
+                    <h2 class="section-title">Core Elements</h2>
+                    <div class="space-y-4">
+                        <div><label for="subject" class="label block mb-1">Subject(s) / Charitra:</label><input type="text" id="subject" class="w-full" placeholder="उदा. ek akela अंतरिक्षयात्री"></div>
+                        <div><label for="action" class="label block mb-1">Primary Action(s) / Mukhya Kriya:</label><input type="text" id="action" class="w-full" placeholder="उदा. ek prachin vastu ki khoj"></div>
+                        <div><label for="setting" class="label block mb-1">Setting/Environment / Sthal:</label><input type="text" id="setting" class="w-full" placeholder="उदा. sunsan Mangal grah"></div>
+                        <button id="enhanceCoreBtn" class="btn btn-ai w-full mt-3">✨ AI se Core Idea Behtar Banayein<span id="enhanceCoreLoader" class="loader hidden"></span></button>
+                    </div>
+                </div>
+                
+                <div>
+                    <h2 class="section-title">Language, Dialogue & Voice / Bhasha, Samvaad Aur Awaaz</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="primaryLang" class="label block mb-1">Primary Language (for Dialogue & Narration):</label>
+                            <select id="primaryLang" class="w-full">
+                                <option value="English">English</option>
+                                </select>
+                        </div>
+                        <div>
+                            <label for="subtitleLang" class="label block mb-1">Subtitle Language (Optional):</label>
+                             <select id="subtitleLang" class="w-full">
+                                <option value="">-- No Subtitles --</option>
+                                </select>
+                        </div>
+                        <div>
+                            <label for="voiceOver" class="label block mb-1">Voice-over Narration (Optional):</label>
+                            <input type="text" id="voiceOver" class="w-full" placeholder="उदा. Deep male voice, mysterious tone, narrating the city's secrets">
+                        </div>
+                        <div id="dialogueContainer">
+                            <label class="label block mb-1">Character Dialogues:</label>
+                            </div>
+                        <div class="flex gap-2 mt-2">
+                            <button id="addDialogueBtn" class="btn btn-secondary text-sm py-2 px-3 flex-grow sm:flex-grow-0">+ Add Dialogue Line</button>
+                            <button id="suggestDialogueBtnAI" class="btn btn-ai btn-small-ai text-sm py-2 px-3 flex-grow sm:flex-grow-0">
+                                ✨ Suggest Dialogue
+                                <span id="suggestDialogueLoader" class="loader loader-small hidden"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="section-title">Music & Sound / Sangeet Aur Dhwani</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="musicStyle" class="label block mb-1">Background Music Style/Mood:</label>
+                            <input type="text" id="musicStyle" class="w-full" placeholder="उदा. Epic orchestral, Synthwave, Lo-fi beats, Tense thriller score">
+                        </div>
+                        <div>
+                            <label for="soundEffects" class="label block mb-1">Key Sound Effects (comma-separated):</label>
+                            <input type="text" id="soundEffects" class="w-full" placeholder="उदा. Distant sirens, rain hitting window, laser blasts, footsteps">
+                        </div>
+                        <button id="suggestMusicSfxBtnAI" class="btn btn-ai btn-small-ai w-full mt-2">
+                            ✨ Suggest Music & SFX
+                            <span id="suggestMusicSfxLoader" class="loader loader-small hidden"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="section-title">Visual Style & Cinematography</h2>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                        <div><label for="overallStyle" class="label block mb-1">Overall Style:</label><select id="overallStyle" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="inspiredBy" class="label block mb-1">Inspired By:</label><input type="text" id="inspiredBy" class="w-full" placeholder="उदा. Blade Runner"></div>
+                        <div><label for="cameraShot" class="label block mb-1">Camera Shot:</label><select id="cameraShot" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="lensType" class="label block mb-1">Lens Type:</label><select id="lensType" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="lightingStyle" class="label block mb-1">Lighting Style:</label><select id="lightingStyle" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="timeOfDay" class="label block mb-1">Time of Day:</label><select id="timeOfDay" class="w-full"><option value="">Select</option></select></div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="section-title">Detail & Realism Enhancers</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                        <div><label for="resolution" class="label block mb-1">Resolution/Quality:</label><select id="resolution" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="textures" class="label block mb-1">Textures Emphasis:</label><select id="textures" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="focus" class="label block mb-1">Focus:</label><select id="focus" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="motion" class="label block mb-1">Motion:</label><select id="motion" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="atmosphere" class="label block mb-1">Atmosphere:</label><select id="atmosphere" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="colorPalette" class="label block mb-1">Color Palette:</label><select id="colorPalette" class="w-full"><option value="">Select</option></select></div>
+                        <div class="sm:col-span-2 grid grid-cols-2 gap-x-6 gap-y-4">
+                            <label class="flex items-center cursor-pointer"><input type="checkbox" id="filmGrain">Film Grain</label>
+                            <label class="flex items-center cursor-pointer"><input type="checkbox" id="lensFlares">Lens Flares</label>
+                            <label class="flex items-center cursor-pointer"><input type="checkbox" id="motionBlur">Motion Blur</label>
+                            <label class="flex items-center cursor-pointer"><input type="checkbox" id="chromaticAberration">Chromatic Aberration</label>
+                        </div>
+                        <div><label for="vfx" class="label block mb-1">VFX Elements:</label><input type="text" id="vfx" class="w-full" placeholder="उदा. subtle particle effects"></div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="section-title">Mood & Keywords</h2>
+                    <div class="space-y-4">
+                        <div><label for="mood" class="label block mb-1">Mood/Feeling:</label><select id="mood" class="w-full"><option value="">Select</option></select></div>
+                        <div><label for="additionalKeywords" class="label block mb-1">Additional Keywords:</label><input type="text" id="additionalKeywords" class="w-full" placeholder="उदा. masterpiece, trending"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6 mt-6 lg:mt-0">
+                <div>
+                    <h2 class="section-title">Generated Prompt / Utpann Prompt (Aap yahaan edit kar sakte hain)</h2>
+                    <textarea id="generatedPrompt" rows="10" class="w-full p-3 text-sm bg-[#1f2937] border border-[#374151] rounded-md focus:border-blue-500 focus:ring-blue-500" placeholder="Aapka cinematic prompt yahaan dikhega... AI se generate karein ya manually likhein."></textarea>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="negativePrompt" class="label">Negative Prompt (Things to avoid) / Nakaratmak Prompt:</label>
+                        <button id="suggestNegativeBtnAI" class="btn btn-ai btn-small-ai text-xs py-1 px-2">
+                            ✨ Suggest Negatives
+                            <span id="suggestNegativeLoader" class="loader loader-small hidden"></span>
+                        </button>
+                    </div>
+                    <textarea id="negativePrompt" rows="3" class="w-full p-3 text-sm" placeholder="उदा. blurry, low quality, watermark, text, ugly..."></textarea>
+                </div>
+                <div class="flex flex-col gap-4">
+                     <button id="brainstormConceptBtn" class="btn btn-ai w-full">
+                        ✨ AI se Form Fields ke Aadhar par Poora Concept Banayein
+                        <span id="brainstormLoader" class="loader hidden"></span>
+                    </button>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <button id="generateBtn" class="btn btn-primary w-full">Fields se Generate/Update Karein</button>
+                        <button id="copyBtn" class="btn btn-secondary w-full">Prompt Copy Karein</button>
+                        <button id="resetBtn" class="btn btn-secondary w-full bg-red-600 hover:bg-red-700">Fields Reset Karein</button>
+                    </div>
+                </div>
+                 <div id="finalPromptPreview" class="mt-4 p-4 bg-[#1a202c] rounded-md border border-[#2d3748] hidden">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-300">Final Prompt (with Negative)</h3>
+                    <p id="finalPromptText" class="text-sm text-gray-400 whitespace-pre-wrap"></p>
+                </div>
+            </div>
+        </div>
+        <footer class="mt-10 pt-6 border-t border-gray-700 text-center text-xs text-gray-500">
+            <p>PromptCraft Pro © 2024-2025. AI features powered by Gemini.</p>
+        </footer>
+    </div>
+
+    <div id="toastNotification" class="toast hidden-toast">Prompt copied to clipboard!</div>
+
+    <script>
+        // 
+    </script>
+</body>
+</html>
